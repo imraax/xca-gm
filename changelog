@@ -13,6 +13,11 @@ xca-gm 2.9.0-gm Thu Sep 10 2026
  * Fix endless loop when importing a public key with OpenSSL 3.0.x/Tongsuo:
    PEM_read_bio_PrivateKey() returns NULL without an error there
  * macOS: bundle Tongsuo's libcrypto next to Qt's OpenSSL libcrypto
+ * GM edition defaults to SM4-CBC for PKCS#12 instead of the insecure
+   PBE-SHA1-3DES, so new databases no longer start with a warning
+ * Complete the Simplified Chinese translation (70 missing strings)
+ * Translate X.509 DN terms (countryName ...) by default for Chinese,
+   Japanese and Korean user interfaces
 
 xca 2.9.0 Fri Mar 28 2025
 -------------------------

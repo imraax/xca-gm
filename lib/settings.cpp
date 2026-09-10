@@ -6,6 +6,7 @@
  */
 
 #include "settings.h"
+#include <QLocale>
 #include "func.h"
 #include "sql.h"
 #include "pki_key.h"
@@ -45,6 +46,11 @@ const QMap<QString, QString> settings::defaults() const
 	return QMap<QString, QString> {
 		{ "mandatory_dn", "" },
 		{ "explicit_dn", "C,ST,L,O,OU,CN,emailAddress" },
+		/* Show translated X.509 terms (e.g. countryName) by default
+		 * for CJK user interface languages */
+		{ "translate_dn", QLocale().language() == QLocale::Chinese ||
+				  QLocale().language() == QLocale::Japanese ||
+				  QLocale().language() == QLocale::Korean ? "yes" : "no" },
 		{ "string_opt", "MASK:0x2002" },
 		{ "workingdir", getHomeDir() + "/" },
 		{ "default_hash", digest::getDefault().name() },

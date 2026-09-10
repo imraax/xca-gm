@@ -217,7 +217,13 @@ const QList<int> encAlgo::all_encAlgos(
 #endif
 });
 
+#if defined(XCA_GM) && defined(NID_sm4_cbc) && !defined(OPENSSL_NO_SM4)
+// GM edition: default to SM4-CBC (PBES2) with HMAC-SM3 instead of the
+// legacy, insecure PBE-SHA1-3DES
+int encAlgo::default_encAlgo(NID_sm4_cbc);
+#else
 int encAlgo::default_encAlgo(NID_pbe_WithSHA1And3_Key_TripleDES_CBC);
+#endif
 
 encAlgo::encAlgo(int nid) : encAlgo_nid(nid)
 {
