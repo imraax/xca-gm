@@ -153,10 +153,12 @@ void pki_pkcs12::writePKCS12(XFile &file, encAlgo &encAlgo) const
 	int certAlgoNid, keyAlgoNid;
 	certAlgoNid = keyAlgoNid = encAlgo.getEncAlgoNid();
 
+#ifdef NID_pbe_WithSHA1And40BitRC2_CBC
 	// The very ancient 40BitRC2_CBC algorithm at least can
 	// be combined with TripleDES_CBC for the keys.
 	if (keyAlgoNid == NID_pbe_WithSHA1And40BitRC2_CBC)
 		keyAlgoNid = NID_pbe_WithSHA1And3_Key_TripleDES_CBC;
+#endif
 
 	EVP_PKEY *pkey = key->decryptKey();
 	for (const QString &line : key->getComment().split('\n')) {
@@ -178,6 +180,13 @@ void pki_pkcs12::writePKCS12(XFile &file, encAlgo &encAlgo) const
 
 	if (encAlgo.legacy())
 		PKCS12_set_mac(pkcs12, pass.data(), -1, NULL, 0, 1, EVP_sha1());
+#if defined(NID_sm4_cbc) && !defined(OPENSSL_NO_SM3)
+	// Use an all-GM/T PKCS#12: SM4-CBC (PBES2) for the content and
+	// HMAC-SM3 for the integrity MAC
+	if (encAlgo.isSM4())
+		PKCS12_set_mac(pkcs12, pass.data(), -1, NULL, 0,
+				PKCS12_DEFAULT_ITER, EVP_sm3());
+#endif
 
 	BioByteArray b;
 	i2d_PKCS12_bio(b, pkcs12);
@@ -198,9 +207,14 @@ void pki_pkcs12::collect_properties(QMap<QString, QString> &prp) const
 // see https://www.rfc-editor.org/rfc/rfc8018 Appendix B.2 for possible encryption schemes
 const QList<int> encAlgo::all_encAlgos(
 {
+#ifdef NID_pbe_WithSHA1And40BitRC2_CBC
 	NID_pbe_WithSHA1And40BitRC2_CBC,
+#endif
 	NID_pbe_WithSHA1And3_Key_TripleDES_CBC,
-	NID_aes_256_cbc
+	NID_aes_256_cbc,
+#if defined(NID_sm4_cbc) && !defined(OPENSSL_NO_SM4)
+	NID_sm4_cbc,
+#endif
 });
 
 int encAlgo::default_encAlgo(NID_pbe_WithSHA1And3_Key_TripleDES_CBC);

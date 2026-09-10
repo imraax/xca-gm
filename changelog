@@ -1,3 +1,19 @@
+xca-gm 2.9.0-gm Thu Sep 10 2026
+-------------------------------
+
+ * Chinese GM/T (国密) support by building against Tongsuo
+   https://github.com/Tongsuo-Project/Tongsuo
+ * New key type SM2 (GB/T 32918) for key generation, import and export
+ * Sign certificates, requests and CRLs with SM2-with-SM3
+ * Add the SM3 digest to the hash algorithm selection
+ * Export PKCS#8 private keys encrypted with SM4-CBC
+ * Export PKCS#12 files with SM4-CBC (PBES2) and HMAC-SM3 integrity MAC
+ * CMake option XCA_GM (AUTO/ON/OFF) and Tongsuo detection
+ * Guard legacy algorithms missing in Tongsuo (RIPEMD160, RC2)
+ * Fix endless loop when importing a public key with OpenSSL 3.0.x/Tongsuo:
+   PEM_read_bio_PrivateKey() returns NULL without an error there
+ * macOS: bundle Tongsuo's libcrypto next to Qt's OpenSSL libcrypto
+
 xca 2.9.0 Fri Mar 28 2025
 -------------------------
 

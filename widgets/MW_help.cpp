@@ -71,6 +71,13 @@ void MainWindow::about()
 	} else {
 		version = QString("%1<br>QT version: %2").arg(openssl).arg(qt);
 	}
+#ifdef XCA_GM
+	version += "<p><b>GM/T (国密) edition:</b> SM2 / SM3 / SM4 enabled";
+#ifdef TONGSUO_VERSION_STRING
+	version += QString(" - <a href=\"https://github.com/Tongsuo-Project/Tongsuo\">"
+			"Tongsuo %1</a>").arg(TONGSUO_VERSION_STRING);
+#endif
+#endif
 	QStringList rows;
 	foreach(QStringList sl, getTranslators()) {
 		QString email;

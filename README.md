@@ -1,6 +1,64 @@
-# XCA - X Certificate and Key Management
+# XCA-GM - X Certificate and Key Management with Chinese GM/T (国密) support
 
 [![CMake](https://github.com/chris2511/xca/actions/workflows/cmake.yaml/badge.svg)](https://github.com/chris2511/xca/actions/workflows/cmake.yaml)
+
+## __XCA-GM (国密版)__
+
+XCA-GM is a fork of [XCA](https://github.com/chris2511/xca) that adds the
+Chinese commercial cryptography algorithms (国密算法) by building against
+[Tongsuo (铜锁)](https://github.com/Tongsuo-Project/Tongsuo), an OpenSSL
+derivative maintained by the OpenAtom foundation:
+
+* **SM2** key pairs (GB/T 32918): generate, import (PEM/DER/PKCS#8), export
+* **SM2-with-SM3** signatures for certificates, certificate requests and CRLs
+* **SM3** digest in the hash selection boxes and for fingerprints
+* **SM4-CBC** encrypted PKCS#8 private keys
+* **PKCS#12** files protected with SM4-CBC (PBES2) and an HMAC-SM3 integrity MAC
+
+Everything else (RSA, DSA, EC, ED25519, PKCS#11 tokens, templates, databases)
+works exactly as in upstream XCA. The GM support is enabled automatically when
+the crypto library provides SM2/SM3/SM4 (`-DXCA_GM=AUTO`, the default), can be
+enforced with `-DXCA_GM=ON` or disabled with `-DXCA_GM=OFF`.
+The GM edition identifies itself as version `x.y.z-gm` in the *About* dialog.
+
+XCA-GM 基于 XCA 改造，通过链接铜锁 (Tongsuo) 密码库实现国密算法支持：
+SM2 密钥生成/导入/导出、SM2-with-SM3 证书/证书请求/CRL 签名、SM3 摘要、
+SM4 加密的 PKCS#8 私钥以及 SM4 + HMAC-SM3 保护的 PKCS#12 文件。
+
+### Build XCA-GM with Tongsuo
+
+1. Build and install Tongsuo (8.4.0 or newer, any prefix works):
+   ```
+   git clone -b 8.4.0 https://github.com/Tongsuo-Project/Tongsuo
+   cd Tongsuo
+   ./config --prefix=/opt/tongsuo --libdir=lib enable-ntls no-tests
+   make -j$(nproc) && make install_sw
+   ```
+2. Configure XCA against Tongsuo instead of the system OpenSSL:
+   ```
+   cmake -B build -DOPENSSL_ROOT_DIR=/opt/tongsuo -DCMAKE_PREFIX_PATH=/opt/tongsuo xca
+   cmake --build build -j$(nproc)
+   ```
+   On macOS add the Qt prefix as well, e.g.
+   `-DCMAKE_PREFIX_PATH="/opt/homebrew/opt/qt;/opt/tongsuo"`.
+3. `cmake` prints `Found Tongsuo 8.4.0` and
+   `Building the GM edition: xca-gm (SM2/SM3/SM4 enabled)`.
+4. Run the tests with `ctest --test-dir build` (the GUI test `testxca`
+   contains an SM2/SM3/SM4 end-to-end test, `test_digest` covers SM3).
+
+A ready to use container build is provided by `Dockerfile.gm`.
+
+Notes:
+* Tongsuo drops some legacy algorithms (RIPEMD160, RC2 based PKCS#12
+  encryption). They are simply not offered when building against Tongsuo.
+* SM2 keys are also supported when building against plain OpenSSL >= 3.0,
+  only the non-standard Tongsuo extensions (e.g. TLCP) are not needed by XCA.
+* SM2 keys on PKCS#11 tokens are not supported.
+* macOS: Qt links its own OpenSSL `libcrypto.3.dylib`. The app bundle therefore
+  contains both libraries, Tongsuo's one is named `libcrypto-tongsuo.3.dylib`.
+
+---
+
 
 ## __Release Notes__
 

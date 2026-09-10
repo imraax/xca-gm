@@ -36,6 +36,7 @@ class test_main: public QObject
 	void exportFormat();
 	void revoke();
 	void testValidity();
+	void gmSM2();
 
   public:
 	template <class T> static T *findWindow(const QString &name)

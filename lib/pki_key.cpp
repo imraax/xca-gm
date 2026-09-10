@@ -269,6 +269,24 @@ int pki_key::getKeyType() const
 	return EVP_PKEY_id(key);
 }
 
+bool pki_key::isSM2() const
+{
+#ifdef XCA_HAVE_SM2
+	return key && getKeyType() == EVP_PKEY_SM2;
+#else
+	return false;
+#endif
+}
+
+bool pki_key::isECbased() const
+{
+#ifndef OPENSSL_NO_EC
+	return key && EVP_PKEY_type(getKeyType()) == EVP_PKEY_EC;
+#else
+	return false;
+#endif
+}
+
 QString pki_key::modulus() const
 {
 	if (getKeyType() == EVP_PKEY_RSA) {
@@ -320,7 +338,7 @@ int pki_key::ecParamNid() const
 {
 	const EC_KEY *ec;
 
-	if (getKeyType() != EVP_PKEY_EC)
+	if (!isECbased())
 		return NID_undef;
 	ec = EVP_PKEY_get0_EC_KEY(key);
 	return EC_GROUP_get_curve_name(EC_KEY_get0_group(ec));
@@ -328,7 +346,7 @@ int pki_key::ecParamNid() const
 
 BIGNUM *pki_key::ecPubKeyBN() const
 {
-	if (getKeyType() != EVP_PKEY_EC)
+	if (!isECbased())
 		return NULL;
 
 	const EC_KEY *ec = EVP_PKEY_get0_EC_KEY(key);
@@ -396,9 +414,18 @@ QList<int> pki_key::possibleHashNids()
 	QList<int> allSha3;
 #endif
 
+#ifdef XCA_HAVE_SM2
+	/* GM/T 0015: SM2 signatures are always combined with SM3 */
+	if (isSM2())
+		return QList<int> { NID_sm3 };
+#endif
 	switch (EVP_PKEY_type(getKeyType())) {
 		case EVP_PKEY_RSA:
-			nids << NID_md5 << NID_ripemd160 << NID_sha1;
+			nids << NID_md5;
+#ifdef NID_ripemd160
+			nids << NID_ripemd160;
+#endif
+			nids << NID_sha1;
 			nids += allSha2 + allSha3;
 			break;
 		case EVP_PKEY_DSA:
@@ -474,7 +501,7 @@ QVariant pki_key::column_data(const dbheader *hd) const
 		case HD_key_curve:
 			QString r;
 #ifndef OPENSSL_NO_EC
-			if (getKeyType() == EVP_PKEY_EC)
+			if (isECbased())
 				r = OBJ_nid2sn(ecParamNid());
 #endif
 			return QVariant(r);
@@ -861,7 +888,7 @@ void pki_key::collect_properties(QMap<QString, QString> &prp) const
 	if (isPubKey())
 		sl << tr("Public key");
 #ifndef OPENSSL_NO_EC
-	if (getKeyType() == EVP_PKEY_EC)
+	if (isECbased())
 		sl << QString(OBJ_nid2ln(ecParamNid()));
 #endif
 	prp["Key"] = sl.join(" ");

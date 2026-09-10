@@ -6,6 +6,7 @@
  */
 
 #include "pki_export.h"
+#include "local.h"
 #include <QDebug>
 
 pki_export::pki_export(int i, enum pki_type p, const QString &e,
@@ -67,6 +68,9 @@ new pki_export( 2, x509, "pem", tr("PEM chain"),     F_PEM | F_USUAL | F_CHAIN |
 new pki_export( 4, x509, "ovpn",   "OpenVPN",        F_OVPN | F_CHAIN | F_PRIVATE | F_SINGLE, tr("The complete certificate chain and the private key of the selected certificate with tags usable in OpenVPN configuration files")),
 new pki_export( 6, x509, "pem", tr("PEM + key"),     F_PEM | F_PRIVATE| F_SINGLE | F_CLIPBOARD, tr("Concatenation of the certificate and the unencrypted private key in one PEM file")),
 new pki_export( 7, x509, "pem",    "PEM + PKCS#8",   F_PEM | F_PKCS8 | F_PRIVATE | F_CRYPT | F_SINGLE | F_CLIPBOARD, tr("Concatenation of the certificate and the encrypted private key in PKCS#8 format in one file")),
+#ifdef XCA_GM
+new pki_export(52, x509, "pem",    "PEM + PKCS#8 SM4", F_PEM | F_PKCS8 | F_PRIVATE | F_CRYPT | F_SM4 | F_SINGLE | F_CLIPBOARD, tr("Concatenation of the certificate and the SM4 encrypted private key in PKCS#8 format in one file")),
+#endif
 new pki_export(40, x509, "pem", tr("All unusable"),  F_PEM | F_UNUSABLE,                     tr("Concatenation of all expired or revoked certificates in one PEM file")),
 new pki_export( 8, x509, "p7b",    "PKCS #7",        F_PKCS7 | F_USUAL | F_SINGLE,           tr("PKCS#7 encoded single certificate")),
 new pki_export(10, x509, "p7b",    "PKCS #7",        F_PKCS7 | F_USUAL | F_MULTI,            tr("All selected certificates encoded in one PKCS#7 file")),
@@ -92,6 +96,9 @@ new pki_export(24, asym_key, "der", tr("DER public"),    F_DER | F_SINGLE,      
 new pki_export(25, asym_key, "der", tr("DER private"),   F_DER | F_PRIVATE | F_SINGLE,                   tr("Unencrypted private key in binary DER format")),
 new pki_export(26, asym_key, "pvk", tr("PVK private"),   F_PVK | F_PRIVATE | F_SINGLE,                   tr("Private key in Microsoft PVK format not encrypted")),
 new pki_export(28, asym_key, "pk8", tr("PKCS #8 encrypted"), F_PKCS8 | F_PRIVATE | F_CRYPT | F_USUAL | F_SINGLE, tr("Encrypted private key in PKCS#8 text format")),
+#ifdef XCA_GM
+new pki_export(53, asym_key, "pk8", tr("PKCS #8 SM4 encrypted"), F_PKCS8 | F_PRIVATE | F_CRYPT | F_SM4 | F_USUAL | F_SINGLE, tr("SM4-CBC encrypted private key in PKCS#8 text format (GM/T)")),
+#endif
 new pki_export(29, asym_key, "pk8", tr("PKCS #8"),       F_PKCS8 | F_PRIVATE | F_CLIPBOARD | F_SINGLE,   tr("Unencrypted private key in PKCS#8 text format")),
 new pki_export(50, asym_key, "jwk", tr("JSON Web Key private"), F_JWK | F_PRIVATE,           tr("Unencrypted private key in JSON Web Key format")),
 new pki_export(51, asym_key, "jwk", tr("JSON Web Key public"),  F_JWK,                       tr("Public key in JSON Web Key format")),

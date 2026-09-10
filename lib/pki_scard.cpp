@@ -562,7 +562,9 @@ QList<int> pki_scard::possibleHashNids()
 		case EVP_PKEY_RSA:
 			switch (mechanism) {
 			case CKM_MD5_RSA_PKCS:    nids << NID_md5; break;
+#ifdef NID_ripemd160
 			case CKM_RIPEMD160_RSA_PKCS: nids << NID_ripemd160; break;
+#endif
 			case CKM_SHA1_RSA_PKCS:   nids << NID_sha1; break;
 			case CKM_SHA256_RSA_PKCS: nids << NID_sha256; break;
 			case CKM_SHA384_RSA_PKCS: nids << NID_sha384; break;
@@ -587,7 +589,10 @@ QList<int> pki_scard::possibleHashNids()
 		switch (EVP_PKEY_type(getKeyType())) {
 		case EVP_PKEY_RSA:
 			nids << NID_md5 << NID_sha1 << NID_sha256 <<
-				NID_sha384 << NID_sha512 << NID_ripemd160;
+				NID_sha384 << NID_sha512;
+#ifdef NID_ripemd160
+			nids << NID_ripemd160;
+#endif
 			break;
 		case EVP_PKEY_DSA:
 #ifndef OPENSSL_NO_EC

@@ -53,6 +53,18 @@ void test_main::newKey()
 	QCOMPARE(dlg->keyLength->isVisible(),false);
 	QCOMPARE(dlg->keySizeLabel->isVisible(),false);
 #endif
+#ifdef XCA_HAVE_SM2
+	/* Select Chinese GM/T SM2 key (after RSA, DSA, EC, ED25519) */
+	dlg->keyType->setCurrentIndex(dlg->keyType->findText("SM2"));
+	QCOMPARE(dlg->getKeyJob().toString(), "SM2");
+	QVERIFY(dlg->getKeyJob().isSM2());
+	QVERIFY(dlg->getKeyJob().isValid());
+	/* Neither key size nor curve is visible */
+	QCOMPARE(dlg->curveBox->isVisible(),false);
+	QCOMPARE(dlg->curveLabel->isVisible(),false);
+	QCOMPARE(dlg->keyLength->isVisible(),false);
+	QCOMPARE(dlg->keySizeLabel->isVisible(),false);
+#endif
 	/* Back to EC and previously set curve is set */
 	dlg->keyType->setCurrentIndex(2);
 	QCOMPARE(dlg->getKeyJob().toString(), "EC:secp521r1");

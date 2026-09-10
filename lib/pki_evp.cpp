@@ -119,9 +119,20 @@ void pki_evp::generate(const keyjob &task)
 		break;
 	}
 #ifndef OPENSSL_NO_EC
+#ifdef XCA_HAVE_SM2
+	case EVP_PKEY_SM2:
+#endif
 	case EVP_PKEY_EC: {
 		EC_KEY *eckey;
-		EC_GROUP *group = EC_GROUP_new_by_curve_name(task.ec_nid);
+		/* SM2 keys always use the fixed GB/T 32918 curve.
+		 * Assigning an EC_KEY on the SM2 curve automatically
+		 * yields an EVP_PKEY of type EVP_PKEY_SM2 */
+		int curve_nid = task.ec_nid;
+#ifdef XCA_HAVE_SM2
+		if (task.isSM2())
+			curve_nid = NID_sm2;
+#endif
+		EC_GROUP *group = EC_GROUP_new_by_curve_name(curve_nid);
 		if (!group)
 			break;
 		eckey = EC_KEY_new();
@@ -249,10 +260,16 @@ void pki_evp::fromPEMbyteArray(const QByteArray &ba, const QString &name)
 						PwDialogCore::pwCallback, &p);
 		if (p.getResult() != pw_ok)
 			throw p.getResult();
-		if (openssl_pw_error())
+		if (openssl_pw_error()) {
+			/* Wrong password: ask again */
 			XCA_PASSWD_ERROR();
-		if (pki_ign_openssl_error())
-			break;
+			continue;
+		}
+		/* Not a private key or an unrelated error.
+		 * OpenSSL 3.0.x (Tongsuo) returns NULL without an error
+		 * for a public key, which used to be an endless loop */
+		pki_ign_openssl_error();
+		break;
 	}
 	if (!pkey) {
 		pki_ign_openssl_error();
@@ -271,7 +288,8 @@ static void search_ec_oid(EVP_PKEY *pkey)
 
 	int keytype = EVP_PKEY_id(pkey);
 
-	if (keytype != EVP_PKEY_EC)
+	/* EVP_PKEY_type() maps SM2 to its base type EC */
+	if (EVP_PKEY_type(keytype) != EVP_PKEY_EC)
 		return;
 
 	ec = EVP_PKEY_get0_EC_KEY(pkey);
@@ -410,10 +428,16 @@ void pki_evp::fload(const QString &fname)
 						NULL, cb, &p);
 		if (p.getResult() != pw_ok)
 			throw p.getResult();
-		if (openssl_pw_error())
+		if (openssl_pw_error()) {
+			/* Wrong password: ask again */
 			XCA_PASSWD_ERROR();
-		if (pki_ign_openssl_error())
-			break;
+			continue;
+		}
+		/* Not a private key or an unrelated error.
+		 * OpenSSL 3.0.x (Tongsuo) returns NULL without an error
+		 * for a public key, which used to be an endless loop */
+		pki_ign_openssl_error();
+		break;
 	} while (!pkey);
 
 	if (!pkey) {

@@ -21,6 +21,17 @@
 #define DEFAULT_KEY_LENGTH 2048
 #define ED25519_KEYLEN 32
 
+/* SM2 (GB/T 32918) support requires OpenSSL >= 1.1.1 or Tongsuo */
+#if defined(EVP_PKEY_SM2) && !defined(OPENSSL_NO_SM2)
+#define XCA_HAVE_SM2
+#endif
+#if !defined(OPENSSL_NO_SM3) && defined(NID_sm3)
+#define XCA_HAVE_SM3
+#endif
+#if !defined(OPENSSL_NO_SM4) && defined(NID_sm4_cbc)
+#define XCA_HAVE_SM4
+#endif
+
 #define VIEW_public_keys_type 6
 #define VIEW_public_keys_len 7
 #define VIEW_public_keys_public 8
@@ -42,6 +53,10 @@ class keytype
 				true, false),
 #ifdef EVP_PKEY_ED25519
 			keytype(EVP_PKEY_ED25519, "ED25519", CKM_VENDOR_DEFINED, false, false),
+#endif
+#ifdef XCA_HAVE_SM2
+			/* Chinese GM/T SM2 key: fixed curve, no length/curve selection */
+			keytype(EVP_PKEY_SM2, "SM2", CKM_VENDOR_DEFINED, false, false),
 #endif
 #endif
 		};
@@ -65,7 +80,19 @@ class keytype
 #ifdef EVP_PKEY_ED25519
 			type == EVP_PKEY_ED25519 ? QString("PRIVATE KEY") :
 #endif
+#ifdef XCA_HAVE_SM2
+			/* SM2 keys use the traditional EC encoding */
+			type == EVP_PKEY_SM2 ? QString("EC PRIVATE KEY") :
+#endif
 				QString("%1 PRIVATE KEY").arg(name);
+	}
+	bool isSM2() const
+	{
+#ifdef XCA_HAVE_SM2
+		return type == EVP_PKEY_SM2;
+#else
+		return false;
+#endif
 	}
 	static const keytype byType(int type)
 	{
@@ -93,7 +120,11 @@ class keytype
 	}
 	static const keytype byPKEY(EVP_PKEY *pkey)
 	{
-		return byType(EVP_PKEY_type(EVP_PKEY_id(pkey)));
+		/* Prefer the exact id (e.g. SM2 is an alias of EC) and
+		 * fall back to the base type */
+		int id = EVP_PKEY_id(pkey);
+		keytype t = byType(id);
+		return t.isValid() ? t : byType(EVP_PKEY_type(id));
 	}
 };
 
@@ -123,14 +154,14 @@ class keyjob
 		ec_nid = NID_undef;
 		if (isEC())
 			ec_nid = OBJ_txt2nid(sl[1].toLatin1());
-		else if (!isED25519())
+		else if (!isED25519() && !isSM2())
 			size = sl[1].toInt();
 		slot = slotid();
 		ign_openssl_error();
 	}
 	QString toString()
 	{
-		if (isED25519())
+		if (isED25519() || isSM2())
 			return ktype.name;
 		return QString("%1:%2").arg(ktype.name) .arg(isEC() ?
 					OBJ_obj2QString(OBJ_nid2obj(ec_nid)) :
@@ -152,11 +183,15 @@ class keyjob
 		return false;
 #endif
 	}
+	bool isSM2() const
+	{
+		return ktype.isSM2();
+	}
 	bool isValid()
 	{
 		if (!ktype.isValid())
 			return false;
-		if (isED25519())
+		if (isED25519() || isSM2())
 			return true;
 		if (isEC() && builtinCurves.containNid(ec_nid))
 			return true;
@@ -217,6 +252,9 @@ class pki_key: public pki_base
 		void fillJWK(QJsonObject &json, const pki_export *xport) const;
 		bool compare(const pki_base *ref) const;
 		int getKeyType() const;
+		/* true for EC and EC-based keys like SM2 */
+		bool isECbased() const;
+		bool isSM2() const;
 		bool isPrivKey() const;
 		virtual bool verify(EVP_PKEY *pkey) const;
 		int getUcount() const;

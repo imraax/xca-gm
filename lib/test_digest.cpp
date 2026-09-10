@@ -17,6 +17,7 @@ class test_digest: public QObject
 private slots:
     void default_digest();
     void convert();
+    void sm3();
 };
 
 void test_digest::default_digest()
@@ -38,6 +39,27 @@ void test_digest::convert()
 	d.adjust(QList<int>({ NID_md5, NID_sha256, NID_sha384 }));
 	QCOMPARE(d.name(), "SHA384");
 
+}
+
+void test_digest::sm3()
+{
+#if !defined(OPENSSL_NO_SM3) && defined(NID_sm3)
+	digest d(EVP_sm3());
+	digest e("sm3");
+
+	QCOMPARE(d.name(), "SM3");
+	QCOMPARE(d.MD(), e.MD());
+	QVERIFY(!d.isInsecure());
+	QVERIFY(digest::all_digests.contains(NID_sm3));
+	/* SM3 is the only digest for SM2 keys */
+	d.adjust(QList<int>({ NID_sm3 }));
+	QCOMPARE(d.name(), "SM3");
+	digest f(EVP_sha256());
+	f.adjust(QList<int>({ NID_sm3 }));
+	QCOMPARE(f.name(), "SM3");
+#else
+	QSKIP("SM3 not available in the crypto library");
+#endif
 }
 
 QTEST_MAIN(test_digest)

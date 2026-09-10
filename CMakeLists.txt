@@ -77,8 +77,6 @@ endif()
 
 file(GLOB UI_FILES ${CMAKE_AUTOUIC_SEARCH_PATHS}/*.ui)
 
-configure_file(local.h.in local.h)
-
 ##### Libraries and executables
 add_library(xcalib STATIC)
 add_executable(${CMAKE_PROJECT_NAME} img/imgres.qrc lib/main.cpp
@@ -114,6 +112,16 @@ endif()
 
 set(QTFIXEDVERSION Qt6 Qt5 CACHE STRING "Force a specific QT version 'Qt5' or 'Qt6'")
 find_package(OpenSSL REQUIRED)
+
+##### Chinese GM/T (国密) support: SM2 / SM3 / SM4
+# XCA_GM=AUTO enables it when the crypto library (Tongsuo or OpenSSL)
+# provides the SM algorithms, ON requires them, OFF disables the GM edition.
+set(XCA_GM AUTO CACHE STRING "Chinese GM/T SM2/SM3/SM4 support (AUTO, ON, OFF)")
+set_property(CACHE XCA_GM PROPERTY STRINGS AUTO ON OFF)
+include(cmake/gm_support.cmake)
+
+# local.h needs the results of the OpenSSL/Tongsuo detection above
+configure_file(local.h.in local.h)
 find_package(QT NAMES ${QTFIXEDVERSION} REQUIRED COMPONENTS Core)
 set(QT Qt${QT_VERSION_MAJOR})
 find_package(${QT} REQUIRED COMPONENTS Core Widgets Sql Help LinguistTools)
@@ -225,6 +233,40 @@ if(APPLE)
         -always-overwrite ${APPSTORE}
     COMMENT "Running macdeployqt..."
   )
+  if (TONGSUO_FOUND)
+    # Qt (QtNetwork) links its own OpenSSL libcrypto.3.dylib, which shares
+    # the file name with Tongsuo's library. macdeployqt bundles only one of
+    # them, so the GM edition would silently run with plain OpenSSL.
+    # Bundle Tongsuo's libcrypto under a distinct name for the xca binary.
+    get_filename_component(TONGSUO_CRYPTO_REAL "${OPENSSL_CRYPTO_LIBRARY}" REALPATH)
+    # macdeployqt names the bundled copy after the library's install name
+    execute_process(COMMAND otool -D "${TONGSUO_CRYPTO_REAL}"
+                    OUTPUT_VARIABLE TONGSUO_CRYPTO_ID ERROR_QUIET
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX REPLACE ".*\n" "" TONGSUO_CRYPTO_ID "${TONGSUO_CRYPTO_ID}")
+    if (NOT TONGSUO_CRYPTO_ID)
+      set(TONGSUO_CRYPTO_ID "${TONGSUO_CRYPTO_REAL}")
+    endif()
+    get_filename_component(TONGSUO_CRYPTO_NAME "${TONGSUO_CRYPTO_ID}" NAME)
+    string(REPLACE "libcrypto" "libcrypto-tongsuo" TONGSUO_BUNDLE_NAME "${TONGSUO_CRYPTO_NAME}")
+    set(TONGSUO_BUNDLE_LIB "@executable_path/../Frameworks/${TONGSUO_BUNDLE_NAME}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy "${TONGSUO_CRYPTO_REAL}"
+          "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/${TONGSUO_BUNDLE_NAME}"
+      COMMAND ${INSTALL_NAME_TOOL} -id "${TONGSUO_BUNDLE_LIB}"
+          "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/${TONGSUO_BUNDLE_NAME}"
+      COMMAND ${INSTALL_NAME_TOOL}
+          -change "@executable_path/../Frameworks/${TONGSUO_CRYPTO_NAME}" "${TONGSUO_BUNDLE_LIB}"
+          -change "${OPENSSL_CRYPTO_LIBRARY}" "${TONGSUO_BUNDLE_LIB}"
+          -change "${TONGSUO_CRYPTO_REAL}" "${TONGSUO_BUNDLE_LIB}"
+          -change "${TONGSUO_CRYPTO_ID}" "${TONGSUO_BUNDLE_LIB}"
+          "$<TARGET_FILE:${PROJECT_NAME}>"
+      COMMAND codesign --force --sign -
+          "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/${TONGSUO_BUNDLE_NAME}"
+      COMMAND codesign --force --sign - "$<TARGET_FILE:${PROJECT_NAME}>"
+      COMMENT "Bundling Tongsuo ${TONGSUO_CRYPTO_NAME} as ${TONGSUO_BUNDLE_NAME}"
+    )
+  endif()
   foreach(installdir ${CMAKE_PREFIX_PATH})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
       COMMAND test ! -e $<TARGET_FILE_DIR:${PROJECT_NAME}>/../PlugIns/sqldrivers/libqsqlmysql.dylib ||
@@ -237,6 +279,15 @@ if(APPLE)
       COMMAND cmake -E copy ${PROVISIONPROFILE}
               $<TARGET_FILE_DIR:${PROJECT_NAME}>/../embedded.provisionprofile)
   endif()
+  if (NOT DEFINED APPLE_DEVELOPER_CERT)
+    # macdeployqt leaves some bundled dylibs (e.g. libbrotlicommon) with an
+    # invalid signature; arm64 kills the process when such a library is
+    # mapped. Re-sign the whole bundle ad-hoc so the build tree app runs.
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND codesign --force --deep --sign - $<TARGET_FILE_DIR:${PROJECT_NAME}>/../..
+      COMMENT "Ad-hoc signing ${PROJECT_NAME}.app ..."
+    )
+  endif()
   if (DEFINED APPLE_DEVELOPER_CERT)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
       COMMAND codesign --deep --signature-size=96000
@@ -246,6 +297,13 @@ if(APPLE)
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/../..
       COMMENT "Running codesign for ${APPLE_DEVELOPER_CERT} ..."
     )
+  endif()
+
+  if (NOT DEFINED APPLE_DEVELOPER_CERT)
+    # The install step rewrites the RPATH with install_name_tool, which
+    # invalidates the ad-hoc signature. Unsigned arm64 binaries are killed
+    # at launch, so re-sign the installed bundle ad-hoc.
+    install(CODE "execute_process(COMMAND codesign --force --deep --sign - \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app\")")
   endif()
 
   set(CPACK_BUNDLE_NAME ${PROJECT_NAME})

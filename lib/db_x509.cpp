@@ -620,7 +620,12 @@ void db_x509::exportItems(const QModelIndexList &list,
 					throw errorEx(tr("Not possible for a token key: '%1'").
 							arg(crt->getIntName()));
 				if (xport->match_all(F_PKCS8)) {
-					pkey->writePKCS8(file, EVP_aes_256_cbc(),
+					const EVP_CIPHER *algo = EVP_aes_256_cbc();
+#ifdef XCA_HAVE_SM4
+					if (xport->match_all(F_SM4))
+						algo = EVP_sm4_cbc();
+#endif
+					pkey->writePKCS8(file, algo,
 						PwDialogCore::pwCallback, true);
 				} else {
 					pkey->writeKey(file, NULL, NULL, true);

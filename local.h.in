@@ -1,4 +1,9 @@
-#define XCA_VERSION "@PROJECT_VERSION@"
+#define XCA_VERSION "@PROJECT_VERSION@@XCA_VERSION_SUFFIX@"
+
+/* Chinese GM/T cryptography (SM2/SM3/SM4) enabled,
+ * usually by linking against Tongsuo (https://github.com/Tongsuo-Project/Tongsuo) */
+#cmakedefine XCA_GM
+#cmakedefine TONGSUO_VERSION_STRING "@TONGSUO_VERSION_STRING@"
 
 /* usually "xca" */
 #define PACKAGE_TARNAME "@PROJECT_NAME@"

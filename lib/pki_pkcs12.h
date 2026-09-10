@@ -32,8 +32,20 @@ class encAlgo
 	int getEncAlgoNid() const;
 	bool legacy() const
 	{
-		return encAlgo_nid == NID_pbe_WithSHA1And3_Key_TripleDES_CBC ||
-			   encAlgo_nid == NID_pbe_WithSHA1And40BitRC2_CBC;
+		return encAlgo_nid == NID_pbe_WithSHA1And3_Key_TripleDES_CBC
+#ifdef NID_pbe_WithSHA1And40BitRC2_CBC
+			|| encAlgo_nid == NID_pbe_WithSHA1And40BitRC2_CBC
+#endif
+			;
+	}
+	/* Chinese GM/T SM4-CBC (PBES2) with SM3 HMAC */
+	bool isSM4() const
+	{
+#ifdef NID_sm4_cbc
+		return encAlgo_nid == NID_sm4_cbc;
+#else
+		return false;
+#endif
 	}
 	static void setDefault(const QString &def);
 	static const encAlgo getDefault();

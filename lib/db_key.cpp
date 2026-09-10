@@ -221,6 +221,10 @@ void db_key::exportItem(const QModelIndex &index, const pki_export *xport,
 
 	if (xport->match_all(F_CRYPT)) {
 		algo = EVP_aes_256_cbc();
+#ifdef XCA_HAVE_SM4
+		if (xport->match_all(F_SM4))
+			algo = EVP_sm4_cbc();
+#endif
 		pwCallback = PwDialogCore::pwCallback;
 	}
 

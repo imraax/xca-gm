@@ -18,6 +18,7 @@ XCA - X Certificate and Key management
    common-actions
    certificate-input
    smartcard
+   gm
    privatekey
    requests
    certificates
