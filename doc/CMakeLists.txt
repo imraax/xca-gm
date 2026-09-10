@@ -11,7 +11,7 @@ find_package(Qt6 QUIET OPTIONAL_COMPONENTS ToolsTools)
 set(FILENAMES
     index commandline requests object-ids common-actions database options
     certificates revocationlist changelog introduction privatekey
-    step-by-step certificate-input template smartcard miscellaneous
+    step-by-step certificate-input template smartcard miscellaneous gm
 )
 
 foreach(file ${FILENAMES})

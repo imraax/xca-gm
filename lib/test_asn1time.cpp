@@ -53,19 +53,23 @@ void test_asn1time::output()
 	QCOMPARE(a.toPlainUTC(), "191125153015Z");
 
 #if !defined(Q_OS_WIN32)
+	/* The abbreviation of the UTC zone ("UTC" or "GMT") depends on the
+	 * Qt version and on the time zone database of the platform */
+	auto pretty_is = [](const a1time &t, const QString &expect) {
+		QString pretty = t.toPretty();
+		QString zone = pretty.section(' ', -1);
+		QVERIFY2(zone == "UTC" || zone == "GMT",
+			qPrintable(QString("Unexpected zone in '%1'").arg(pretty)));
+		QCOMPARE(pretty.section(' ', 0, -2), expect);
+	};
 	a.setTimeZone(QTimeZone("UTC"));
-	#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-		#define UTC "GMT"
-	#else
-		#define UTC "UTC"
-	#endif
-	QCOMPARE(a.toPretty(), "Monday, 25 November 2019 15:30:15 " UTC);
+	pretty_is(a, "Monday, 25 November 2019 15:30:15");
 
 	a.setTimeZone(QTimeZone("Europe/Berlin"));
-	QCOMPARE(a.toPretty(), "Monday, 25 November 2019 14:30:15 " UTC);
+	pretty_is(a, "Monday, 25 November 2019 14:30:15");
 
 	a.setTimeZone(QTimeZone("UTC+07:00"));
-	QCOMPARE(a.toPretty(), "Monday, 25 November 2019 08:30:15 " UTC);
+	pretty_is(a, "Monday, 25 November 2019 08:30:15");
 #endif
 }
 

@@ -15,14 +15,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 
+#include <QtGlobal>
+#include "local.h"
+
 #ifndef PACKAGE_NAME
 #define XCA_TITLE "X Certificate and Key management"
 #else
 #define XCA_TITLE PACKAGE_NAME
 #endif
-
-#include <QtGlobal>
-#include "local.h"
 
 #define CCHAR(x) qPrintable(x)
 

@@ -30,6 +30,11 @@ if(Git_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     math(EXPR PROJECT_VERSION_PATCH "${PROJECT_VERSION_PATCH} + ${GIT_COMMIT_COUNTER}")
     set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
     message(STATUS "Commit counter: ${GIT_COMMIT_COUNTER} - ${GIT_REV} - ${PROJECT_VERSION}")
+    if(GIT_COMMIT_COUNTER EQUAL 0 AND NOT GIT_LOCAL_CHANGES)
+      # Exactly at the release tag without local changes: a release build
+      message(STATUS "Release build of v${PROJECT_VERSION}")
+      set(GIT_REV "")
+    endif()
   endif()
   # XCA-GM releases are tagged v<version> (upstream XCA used RELEASE.<version>)
   set(RELEASE_TAG "v${PROJECT_VERSION}"

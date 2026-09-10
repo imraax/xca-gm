@@ -1,7 +1,6 @@
 # XCA-GM 国密证书管理器
 
-[![XCA-GM (Tongsuo)](https://github.com/imraax/xca-gm/actions/workflows/tongsuo.yaml/badge.svg)](https://github.com/imraax/xca-gm/actions/workflows/tongsuo.yaml)
-[![CMake (plain OpenSSL)](https://github.com/imraax/xca-gm/actions/workflows/cmake.yaml/badge.svg)](https://github.com/imraax/xca-gm/actions/workflows/cmake.yaml)
+[![Build](https://github.com/imraax/xca-gm/actions/workflows/build.yaml/badge.svg)](https://github.com/imraax/xca-gm/actions/workflows/build.yaml)
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
 
 **XCA-GM** 是 [XCA](https://github.com/chris2511/xca)（X Certificate and Key management）的国密分支，
@@ -9,6 +8,7 @@
 是一个图形化的 X.509 证书、证书请求、密钥和 CRL 管理工具，可以作为完整的 CA 使用。
 
 - 项目主页：<https://github.com/imraax/xca-gm>
+- 构建与发布：全部通过 GitHub Actions 完成（Linux / macOS / Windows 均基于 Tongsuo；推送 `v*` 标签自动发布 Release）
 - 作者 / 维护：RaaX
 - 当前版本：**1.0.0**（基于 XCA 2.9.0 与 Tongsuo 8.4.0）
 - 许可证：BSD-3-Clause（与 XCA 相同），见 [LICENSE](LICENSE)
@@ -84,6 +84,7 @@ CMake 选项 `XCA_GM`：`AUTO`（默认，密码库支持 SM 算法时启用）�
   （或 Qt5：`qtbase5-dev qttools5-dev libqt5sql5 libqt5help5`）。
 - **Windows**：使用 MinGW 工具链，Tongsuo 需按其文档在 MSYS2 下构建，然后
   `cmake -B build -G "MinGW Makefiles" -DOPENSSL_ROOT_DIR=<tongsuo 前缀> xca-gm`。
+  GitHub Actions 的 Windows 任务即按此方式在 MSYS2 中构建 Tongsuo（`./Configure mingw64`），再用 Qt 自带的 MinGW 编译 XCA-GM。
 - **Docker**：`docker build -t xca-gm .` 会在容器内自动构建 Tongsuo 与 XCA-GM，见 [INSTALL.docker](INSTALL.docker)。
 
 ## 国密使用说明

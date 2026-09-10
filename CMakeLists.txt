@@ -135,6 +135,29 @@ set(QT Qt${QT_VERSION_MAJOR})
 find_package(${QT} REQUIRED COMPONENTS Core Widgets Sql Help LinguistTools)
 find_package(${QT} QUIET COMPONENTS Test)
 
+if (APPLE)
+  # The AGL framework was removed from the macOS 26 SDK (Xcode 26), but
+  # CMake's FindOpenGL / Qt's WrapOpenGL still pick it up from the runtime
+  # directory /System/Library/Frameworks, which makes the link step fail
+  # with "ld: framework 'AGL' not found". XCA does not use AGL: drop it
+  # from the imported targets.
+  foreach(tgt WrapOpenGL::WrapOpenGL OpenGL::GL OpenGL::GLU
+              ${QT}::Gui ${QT}::GuiPrivate ${QT}::Widgets ${QT}::OpenGL)
+    if (TARGET ${tgt})
+      foreach(prop INTERFACE_LINK_LIBRARIES IMPORTED_LINK_INTERFACE_LIBRARIES
+                   IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE
+                   IMPORTED_LINK_INTERFACE_LIBRARIES_DEBUG)
+        get_target_property(_libs ${tgt} ${prop})
+        if (_libs)
+          list(FILTER _libs EXCLUDE REGEX "AGL")
+          set_target_properties(${tgt} PROPERTIES ${prop} "${_libs}")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+  unset(_libs)
+endif()
+
 include(cmake/openssl_v_err.cmake)
 if (${QT_VERSION} VERSION_LESS 5.10.0)
   message(FATAL_ERROR "Qt-${QT_VERSION} not supported, please use at least Qt-5.10.1")
@@ -314,7 +337,7 @@ if(APPLE)
     # The install step rewrites the RPATH with install_name_tool, which
     # invalidates the ad-hoc signature. Unsigned arm64 binaries are killed
     # at launch, so re-sign the installed bundle ad-hoc.
-    install(CODE "execute_process(COMMAND codesign --force --deep --sign - \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app\")")
+    install(CODE "execute_process(COMMAND codesign --force --deep --sign - \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app\")")
   endif()
 
   set(CPACK_BUNDLE_NAME ${XCA_GM_NAME})

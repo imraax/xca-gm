@@ -21,6 +21,11 @@ project = '@PROJECT_NAME@'
 copyright = '2026 RaaX (XCA-GM); 2001-2024 Christian Hohnstädt (XCA)'
 author = 'RaaX'
 html_title = 'XCA-GM 国密证书管理器'
+
+# The application looks for xca.qhc and the qthelp://org.sphinx.xca/
+# namespace (lib/func.cpp, widgets/Help.cpp), keep the upstream names
+qthelp_basename = 'xca'
+qthelp_namespace = 'org.sphinx.xca'
 master_doc = 'index'
 
 # The full version, including alpha/beta/rc tags

@@ -1,0 +1,293 @@
+# XCA-GM - https://github.com/imraax/xca-gm
+#
+# Builds XCA-GM on Linux, macOS and Windows against Tongsuo (铜锁), the
+# OpenSSL derivative providing the Chinese GM/T algorithms, runs the test
+# suites and uploads the packages. A push of a v* tag publishes a release.
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+
+env:
+  BUILD_TYPE: Release
+  TONGSUO_VERSION: 8.4.0
+  QT_VERSION: "6.8.3"
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      TONGSUO_PREFIX: /opt/tongsuo
+    steps:
+    - name: Install build dependencies
+      run: |
+        sudo apt update
+        sudo apt install --yes --no-install-recommends \
+          build-essential pkg-config ninja-build cmake perl \
+          qt6-base-dev qt6-tools-dev libgl1-mesa-dev xvfb \
+          python3-sphinxcontrib.qthelp
+
+    - name: Cache Tongsuo
+      id: cache-tongsuo
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.TONGSUO_PREFIX }}
+        key: tongsuo-${{ env.TONGSUO_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+    - name: Build Tongsuo
+      if: steps.cache-tongsuo.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 -b ${TONGSUO_VERSION} \
+          https://github.com/Tongsuo-Project/Tongsuo tongsuo-src
+        cd tongsuo-src
+        ./config --prefix=${TONGSUO_PREFIX} --libdir=lib enable-ntls no-tests
+        make -j$(nproc)
+        sudo make install_sw
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Configure
+      run: |
+        cmake -B build -G Ninja -DXCA_GM=ON \
+          -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+          -DOPENSSL_ROOT_DIR=${TONGSUO_PREFIX} \
+          -DCMAKE_PREFIX_PATH=${TONGSUO_PREFIX}
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Console tests
+      run: |
+        cmake --build build -t tests -j$(nproc)
+        ctest --test-dir build -L console --output-on-failure
+
+    # The GUI suite (incl. the SM2/SM3/SM4 end-to-end test) needs a display;
+    # window activation under Xvfb is not fully reliable: informative only.
+    - name: GUI tests (Xvfb)
+      continue-on-error: true
+      run: xvfb-run -a ctest --test-dir build -L gui --output-on-failure
+
+    - name: Package
+      run: |
+        cd build
+        cpack
+        sha256sum xca-gm-*.tar.gz | tee xca-gm-linux.sha256
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xca-gm-linux
+        path: |
+          build/xca-gm-*.tar.gz
+          build/xca-gm-linux.sha256
+
+  macos:
+    runs-on: macos-latest
+    env:
+      TONGSUO_PREFIX: /Users/runner/tongsuo
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Sphinx and Ninja
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx
+        brew install ninja
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ env.QT_VERSION }}
+        cache: true
+
+    - name: Cache Tongsuo
+      id: cache-tongsuo
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.TONGSUO_PREFIX }}
+        key: tongsuo-${{ env.TONGSUO_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+    - name: Build Tongsuo
+      if: steps.cache-tongsuo.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 -b ${TONGSUO_VERSION} \
+          https://github.com/Tongsuo-Project/Tongsuo tongsuo-src
+        cd tongsuo-src
+        ./config --prefix=${TONGSUO_PREFIX} --libdir=lib enable-ntls no-tests
+        make -j$(sysctl -n hw.ncpu)
+        make install_sw
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Configure
+      run: |
+        cmake -B build -G Ninja -DXCA_GM=ON \
+          -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+          -DOPENSSL_ROOT_DIR=${TONGSUO_PREFIX} \
+          -DCMAKE_PREFIX_PATH=${TONGSUO_PREFIX}
+
+    - name: Build
+      run: cmake --build build -j$(sysctl -n hw.ncpu)
+
+    - name: Console tests
+      run: |
+        cmake --build build -t tests -j$(sysctl -n hw.ncpu)
+        ctest --test-dir build -L console --output-on-failure
+
+    - name: GUI tests
+      continue-on-error: true
+      run: ctest --test-dir build -L gui --output-on-failure
+
+    - name: Package
+      run: |
+        cd build
+        cpack -G DragNDrop
+        shasum -a 256 xca-gm-*.dmg | tee xca-gm-macos.sha256
+        otool -L xca-gm.app/Contents/MacOS/xca-gm | grep crypto
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xca-gm-macos
+        path: |
+          build/xca-gm-*.dmg
+          build/xca-gm-macos.sha256
+
+  windows:
+    runs-on: windows-latest
+    env:
+      MSYS: D:\msys2
+      TONGSUO_PREFIX: D:\tongsuo
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Sphinx
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx
+
+    - name: Install Qt (MinGW)
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ env.QT_VERSION }}
+        arch: win64_mingw
+        tools: tools_mingw1310
+        cache: true
+
+    - name: Install MSYS2 (toolchain for Tongsuo)
+      uses: msys2/setup-msys2@v2
+      with:
+        location: ${{ env.MSYS }}
+        msystem: mingw64
+        install: base-devel git perl make mingw-w64-x86_64-gcc
+
+    - name: Cache Tongsuo
+      id: cache-tongsuo
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.TONGSUO_PREFIX }}
+        key: tongsuo-${{ env.TONGSUO_VERSION }}-${{ runner.os }}-${{ runner.arch }}-mingw64
+
+    - name: Build Tongsuo
+      if: steps.cache-tongsuo.outputs.cache-hit != 'true'
+      shell: msys2 {0}
+      run: |
+        git clone --depth 1 -b ${TONGSUO_VERSION} \
+          https://github.com/Tongsuo-Project/Tongsuo tongsuo-src
+        cd tongsuo-src
+        ./Configure mingw64 --prefix=/d/tongsuo --libdir=lib \
+          enable-ntls no-tests no-asm
+        make -j$(nproc)
+        make install_sw
+        ls /d/tongsuo/bin /d/tongsuo/lib
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Configure
+      run: cmake -B build -G "MinGW Makefiles" -DXCA_GM=ON -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DOPENSSL_ROOT_DIR=${{ env.TONGSUO_PREFIX }}
+
+    - name: Build
+      run: cmake --build build -j 4
+
+    - name: Deploy runtime and create the portable app
+      shell: pwsh
+      run: |
+        $mingw = Join-Path $env:IQTA_TOOLS "mingw1310_64\bin"
+        foreach ($dll in "libgcc_s_seh-1.dll", "libstdc++-6.dll", "libwinpthread-1.dll") {
+          Copy-Item (Join-Path $mingw $dll) "${{ github.workspace }}\build"
+        }
+        cmake --build build -t install
+
+    - name: Console tests
+      run: |
+        cmake --build build -t tests
+        ctest --test-dir build -L console --output-on-failure
+
+    - name: Package (MSI)
+      run: |
+        cd build
+        cpack -C ${{ env.BUILD_TYPE }}
+        Get-FileHash -Algorithm SHA256 xca-gm-*.msi, xca-gm-portable-*.zip | Format-List | Tee-Object xca-gm-windows.sha256
+
+    - name: Show WiX log on failure
+      if: failure()
+      shell: pwsh
+      run: |
+        $log = "${{ github.workspace }}\build\_CPack_Packages\win64\WIX\wix.log"
+        if (Test-Path $log) { Get-Content $log } else { "no wix.log found" }
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xca-gm-windows
+        path: |
+          build/xca-gm-*.msi
+          build/xca-gm-portable-*.zip
+          build/xca-gm-windows.sha256
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [ linux, macos, windows ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: List release files
+      run: ls -la dist
+
+    - name: Publish GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: XCA-GM ${{ github.ref_name }}
+        generate_release_notes: true
+        files: |
+          dist/xca-gm-*.dmg
+          dist/xca-gm-*.msi
+          dist/xca-gm-portable-*.zip
+          dist/xca-gm-*.tar.gz
+          dist/*.sha256

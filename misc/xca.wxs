@@ -18,7 +18,7 @@
 	<MajorUpgrade Schedule="afterInstallInitialize"
                       DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
 
-        <Media Id="1" Cabinet="xca-gm.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="xcagm.cab" EmbedCab="yes" />
         <!-- https://docs.microsoft.com/de-de/windows/win32/msi/icon-table?redirectedfrom=MSDN -->
         <Icon Id="icon.exe" SourceFile="xca-gm.exe"/>
 
@@ -47,49 +47,49 @@
         <DirectoryRef Id="INSTALLDIR">
             <Component Id="Cxcagm.exe" Guid="5d2c0f7e-9b1a-4c36-8e4f-2a7b6d9c3e15">
                 <File Id="xcagm.exe" Source="xca-gm.exe" KeyPath="yes"/>
-                <ProgId Id="XCAGM.Database" Description="XCA-GM Database" Icon="xca-gm.exe">
+                <ProgId Id="XCAGM.Database" Description="XCA-GM Database" Icon="xcagm.exe">
                     <Extension Id="xdb" ContentType="application/x-xca-database">
-                        <Verb Id="open" Command="Open" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="open" Command="Open" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.Template" Description="XCA-GM Template" Icon="xca-gm.exe">
+                <ProgId Id="XCAGM.Template" Description="XCA-GM Template" Icon="xcagm.exe">
                     <Extension Id="xca" ContentType="application/x-xca-template">
-                        <Verb Id="open" Command="Open" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="open" Command="Open" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
             </Component>
             <Component Id="Cextensions" Guid="97df41c4-624f-488b-84b8-7f1cf4018da3" KeyPath="yes">
-                <ProgId Id="XCAGM.PEM" Description="Privacy Enhanced Mail" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.PEM" Description="Privacy Enhanced Mail" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="pem" ContentType="application/x-pem-file">
-                        <Verb Id="openwithxca.pem" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.pem" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.cer" Description="X.509 Certificate" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.cer" Description="X.509 Certificate" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="cer" ContentType="application/pkix-cert">
-                        <Verb Id="openwithxca.cer" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.cer" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.crl" Description="X.509 Certificate Revocation List" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.crl" Description="X.509 Certificate Revocation List" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="crl" ContentType="application/pkix-crl">
-                        <Verb Id="openwithxca.crl" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.crl" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.crt" Description="X.509 Certificate" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.crt" Description="X.509 Certificate" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="crt" ContentType="application/x-x509-ca-cert">
-                        <Verb Id="openwithxca.crt" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.crt" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.p12" Description="PKCS#12 Certificate and key" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.p12" Description="PKCS#12 Certificate and key" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="p12" ContentType="application/x-pkcs12">
-                        <Verb Id="openwithxca.p12" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.p12" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                     <Extension Id="pfx" ContentType="application/x-pkcs12">
-                        <Verb Id="openwithxca.pfx" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.pfx" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
-                <ProgId Id="XCAGM.p7b" Description="X.509 Certificate" Icon="xca-gm.exe" IconIndex="0">
+                <ProgId Id="XCAGM.p7b" Description="X.509 Certificate" Icon="xcagm.exe" IconIndex="0">
                     <Extension Id="p7b" ContentType="application/x-pkcs7-certificates">
-                        <Verb Id="openwithxca.p7b" Command="Open with XCA-GM" TargetFile="xca-gm.exe" Argument="&quot;%1&quot;" />
+                        <Verb Id="openwithxca.p7b" Command="Open with XCA-GM" TargetFile="xcagm.exe" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
             </Component>
