@@ -4,9 +4,14 @@
    contain the root `toctree` directive.
 
 
-========================================
-XCA - X Certificate and Key management
-========================================
+=================================================
+XCA-GM - X Certificate and Key management (GM/T)
+=================================================
+
+**XCA-GM 国密证书管理器** is a fork of `XCA <https://github.com/chris2511/xca>`_
+with Chinese GM/T cryptography (SM2 / SM3 / SM4) support, built on the
+`Tongsuo <https://github.com/Tongsuo-Project/Tongsuo>`_ crypto library.
+Project: https://github.com/imraax/xca-gm
 
 .. toctree::
    :maxdepth: 2

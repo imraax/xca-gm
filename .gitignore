@@ -9,3 +9,4 @@ moc_*
 xca
 misc/variables.wxi
 build/
+.DS_Store

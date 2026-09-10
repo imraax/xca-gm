@@ -38,13 +38,11 @@ Please use the *Open Remote DataBase* menu item to connect to a remote host.
 Download
 --------
 
-The most recent stable version of XCA can be downloaded from
-http://hohnstaedt.de/xca/index.php/download
+The most recent version of XCA-GM, its source code and the issue tracker
+can be found at https://github.com/imraax/xca-gm
 
-The current (unstable) HEAD of development can be downloaded and tested via
+XCA-GM is based on XCA, whose upstream releases are available at
 https://github.com/chris2511/xca/
-
-Please do not hesitate to contact me for information about branches.
 
 DH Parameters
 --------------

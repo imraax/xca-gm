@@ -101,7 +101,7 @@ static QString registryInstallDir()
 	wchar_t inst_dir[2048] = L"";
 	ULONG len = sizeof inst_dir;
 
-	if (RegGetValueW(HKEY_LOCAL_MACHINE, L"Software\\xca",
+	if (RegGetValueW(HKEY_LOCAL_MACHINE, L"Software\\xca-gm",
 			L"Install_Dir64", RRF_RT_REG_SZ, NULL,
 			inst_dir, &len) != ERROR_SUCCESS)
 		return dir;

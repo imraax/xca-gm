@@ -1,5 +1,10 @@
-xca-gm 2.9.0-gm Thu Sep 10 2026
--------------------------------
+xca-gm 1.0.0 Thu Sep 10 2026
+----------------------------
+
+ * First release of XCA-GM (国密证书管理器), a fork of XCA 2.9.0 by RaaX
+   https://github.com/imraax/xca-gm
+ * Renamed the product to XCA-GM (binary xca-gm, application id
+   io.github.imraax.xca-gm) so it installs side by side with XCA
 
  * Chinese GM/T (国密) support by building against Tongsuo
    https://github.com/Tongsuo-Project/Tongsuo

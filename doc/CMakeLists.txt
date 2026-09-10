@@ -160,8 +160,8 @@ endif(SPHINX)
 
 if (NOT WIN32)
   add_custom_command(
-    OUTPUT "${D}/xca.1.gz"
-    COMMAND cat "${S}/xca.1.head" "${D}/xca.1.options" "${S}/xca.1.tail" | gzip -n9 > "${D}/xca.1.gz"
+    OUTPUT "${D}/${CMAKE_PROJECT_NAME}.1.gz"
+    COMMAND cat "${S}/xca.1.head" "${D}/xca.1.options" "${S}/xca.1.tail" | gzip -n9 > "${D}/${CMAKE_PROJECT_NAME}.1.gz"
     DEPENDS "${S}/xca.1.head" "${S}/xca.1.tail"
             "${D}/xca.1.options"
     COMMENT "Compiling man page"
@@ -171,9 +171,9 @@ if (NOT WIN32)
     COMMAND xcadoc man "${D}/xca.1.options"
     COMMENT "Generate 'man' commandline documentation"
   )
-  add_custom_target(manpage ALL DEPENDS ${D}/xca.1.gz)
+  add_custom_target(manpage ALL DEPENDS ${D}/${CMAKE_PROJECT_NAME}.1.gz)
   if (NOT APPLE)
-    install(FILES "${D}/xca.1.gz" DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+    install(FILES "${D}/${CMAKE_PROJECT_NAME}.1.gz" DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
   endif()
   add_dependencies(${CMAKE_PROJECT_NAME} manpage)
 endif()

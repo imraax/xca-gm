@@ -5,7 +5,9 @@
     <true/>
     <key>com.apple.security.files.user-selected.read-write</key>
     <true/>
+    <!-- Replace TEAMID with your own Apple Developer Team ID when
+         building an App Store compliant XCA-GM (-DAPPSTORE_COMPLIANT=ON) -->
     <key>com.apple.application-identifier</key>
-    <string>HWR8GSJ73M.de.hohnstaedt.xca</string>
+    <string>TEAMID.io.github.imraax.xca-gm</string>
 </dict>
 </plist>

@@ -23,11 +23,11 @@ list(APPEND APP_RESOURCES "${XCA_TEMPLATES}")
 
 macro(Text_header file)
   if (APPLE)
-    set(DIR_HINT "HOME/Library/Application Support/data/de.hohnstaedt.xca/${file}.txt")
+    set(DIR_HINT "HOME/Library/Application Support/${XCA_GM_APP_ID}/${file}.txt")
   elseif (WIN32)
-    set(DIR_HINT "PROFILE\\Application Data\\xca\\${file}.txt")
+    set(DIR_HINT "PROFILE\\Application Data\\${XCA_GM_APP_ID}\\${file}.txt")
   else()
-    set(DIR_HINT "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/${file}.txt or \$HOME/.local/share/de.hohnstaedt.xca/${file}.txt")
+    set(DIR_HINT "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}/${file}.txt or \$HOME/.local/share/${XCA_GM_APP_ID}/${file}.txt")
   endif()
 
   file(READ "${S}/preamble.txt" PREAMBLE)
@@ -66,21 +66,30 @@ if (UNIX AND NOT APPLE)
   install(FILES ${TEXT_FILES} ${XCA_TEMPLATES}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}
   )
-  install(FILES misc/de.hohnstaedt.xca.desktop
+  install(FILES misc/${XCA_GM_APP_ID}.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
   )
   install(FILES misc/xca.completion
         DESTINATION ${CMAKE_INSTALL_DATADIR}/bash-completion/completions
-        RENAME xca
+        RENAME ${CMAKE_PROJECT_NAME}
+  )
+  install(FILES ${PROJECT_SOURCE_DIR}/COPYRIGHT misc/LICENSE-Tongsuo.txt
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}
   )
   install(FILES misc/xca.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/mime/packages
   )
-  install(FILES misc/de.hohnstaedt.xca.metainfo.xml
+  install(FILES misc/${XCA_GM_APP_ID}.metainfo.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
   )
 elseif(WIN32)
   install(FILES ${TEXT_FILES} ${XCA_TEMPLATES}
+          ${PROJECT_SOURCE_DIR}/COPYRIGHT ${S}/LICENSE-Tongsuo.txt
 	  DESTINATION ${RUNTIME_DEST}
   )
 endif()
+
+# Ship the licenses of XCA-GM and of the linked Tongsuo library
+set(LICENSE_FILES ${PROJECT_SOURCE_DIR}/COPYRIGHT ${S}/LICENSE-Tongsuo.txt)
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${LICENSE_FILES})
+list(APPEND APP_RESOURCES ${LICENSE_FILES})

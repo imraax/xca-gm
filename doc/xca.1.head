@@ -1,13 +1,14 @@
-.TH XCA 1
+.TH XCA-GM 1
 .SH NAME
-.B xca
-\- X Certificate and key management
+.B xca-gm
+\- X Certificate and key management with Chinese GM/T (SM2/SM3/SM4) support
 .br
 
-A GUI for handling X509 certificates, RSA/DSA/EC keys, PKCS#10 Requests and
-CRLs in Software and on Smartcards.
+A GUI for handling X509 certificates, RSA/DSA/EC/SM2 keys, PKCS#10 Requests and
+CRLs in Software and on Smartcards. XCA-GM is a fork of XCA built against
+the Tongsuo crypto library.
 .SH SYNOPSIS
-.B xca
+.B xca-gm
 .RI [ OPTIONS ]
 .br
 .SH "DESCRIPTION"
@@ -15,7 +16,9 @@ This application is intended as CA, certificate- and Key store.
 It uses a SQL database to store the items. By default this is SQLite3,
 but MySQL and PostrgreSQL are also tested and supported.
 Known types are Certificate signing requests (PKCS#10), Certificates (X509v3),
-RSA, DSA and EC keys and Certificate revocation lists.
+RSA, DSA, EC and SM2 keys and Certificate revocation lists.
+Certificates, requests and CRLs can be signed with SM2-with-SM3,
+private keys and PKCS#12 files can be protected with SM4.
 The signing of requests, and the creation of self-signed certificates
 is supported. Both can use templates for simplicity.
 The PKI structures can be imported and exported in several formats

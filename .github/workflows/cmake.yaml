@@ -1,4 +1,4 @@
-name: CMake
+name: CMake (plain OpenSSL)
 
 on: [ push, pull_request ]
 
@@ -18,14 +18,14 @@ jobs:
         - os: ubuntu
           generator: Unix Makefiles
           openssl_root: /usr
-          artifact: build/xca-*-Linux.tar.gz
+          artifact: build/xca-gm-*-Linux.tar.gz
           host: linux
           runs: ubuntu-latest
 
         - os: macos
           generator: Unix Makefiles
           openssl_root: /opt/homebrew/opt/openssl
-          artifact: build/xca-*.dmg
+          artifact: build/xca-gm-*.dmg
           host: mac
           runs: macos-latest
 
@@ -33,8 +33,8 @@ jobs:
           generator: MinGW Makefiles
           openssl_root: D:\msys2\msys64\mingw64
           artifact: |
-             build/xca-*.msi
-             build/xca-portable-*.zip
+             build/xca-gm-*.msi
+             build/xca-gm-portable-*.zip
           host: windows
 
         - os: windows

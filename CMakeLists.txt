@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.13.0)
 
-project(xca
-    DESCRIPTION "X Certificate and Key management"
-    HOMEPAGE_URL http://xca.hohnstaedt.de
+project(xca-gm
+    DESCRIPTION "XCA-GM - X Certificate and Key management (GM/T)"
+    HOMEPAGE_URL https://github.com/imraax/xca-gm
     LANGUAGES CXX
 )
+
+##### Product identity of XCA-GM (a fork of XCA by Christian Hohnstädt)
+set(XCA_GM_NAME "XCA-GM")
+set(XCA_GM_NAME_ZH "国密证书管理器")
+set(XCA_GM_AUTHOR "RaaX")
+set(XCA_GM_URL "https://github.com/imraax/xca-gm")
+set(XCA_GM_APP_ID "io.github.imraax.xca-gm")
+set(XCA_GM_COPYRIGHT "Copyright (C) 2026 RaaX. Based on XCA, Copyright (C) 2001 - 2024 Christian Hohnstädt")
 
 file(READ VERSION.txt ver)
 string(REGEX MATCH "([0-9\.]*)" _ ${ver})
@@ -182,7 +190,7 @@ endif()
 
 macro(guid content)
   string(
-    UUID GUID NAMESPACE f243d4ea-d51d-42fc-a3c0-4eb186c55d34
+    UUID GUID NAMESPACE 8c1f3b62-4a7e-4d0b-9f21-6e5b2c9a7d41
     NAME ${content} TYPE SHA1
   )
 endmacro()
@@ -214,6 +222,9 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
 )
 
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VENDOR "${XCA_GM_AUTHOR}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
+set(CPACK_PACKAGE_HOMEPAGE_URL "${XCA_GM_URL}")
 
 ###############################################
 ##### Host specific settings
@@ -306,7 +317,7 @@ if(APPLE)
     install(CODE "execute_process(COMMAND codesign --force --deep --sign - \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app\")")
   endif()
 
-  set(CPACK_BUNDLE_NAME ${PROJECT_NAME})
+  set(CPACK_BUNDLE_NAME ${XCA_GM_NAME})
   set(CPACK_GENERATOR "DragNDrop") #;productbuild")
 
 elseif(WIN32)
@@ -328,9 +339,10 @@ elseif(WIN32)
   )
   set(QT_USE_QTMAIN TRUE)
   set(CPACK_GENERATOR WIX)
-  set(CPACK_PACKAGE_VENDOR "Christian Hohnstädt")
+  set(CPACK_PACKAGE_VENDOR "${XCA_GM_AUTHOR}")
   set(CPACK_WIX_TEMPLATE "${PROJECT_SOURCE_DIR}/misc/xca.wxs")
-  set(CPACK_WIX_UPGRADE_GUID "23fdacfe-3ef8-45b4-81e8-b0c90244c217")
+  # Distinct from upstream XCA so both can be installed side by side
+  set(CPACK_WIX_UPGRADE_GUID "b7e2a9c4-3d5f-4e81-a6c2-1f9d8e7b5a30")
   set(CPACK_WIX_UI_BANNER "${PROJECT_SOURCE_DIR}/img/banner.bmp")
   set(CPACK_WIX_UI_DIALOG "${PROJECT_SOURCE_DIR}/img/dialog.bmp")
   set(CPACK_WIX_LICENSE_RTF "${PROJECT_SOURCE_DIR}/misc/copyright.rtf")

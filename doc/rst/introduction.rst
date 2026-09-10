@@ -12,6 +12,10 @@
   SQLite, MySQL (MariaDB), PostgreSQL and MicrosoftSQL (ODBC) databases
   are supported.
 
+  XCA-GM additionally supports the Chinese GM/T algorithms: SM2 keys,
+  SM2-with-SM3 signatures and SM4 encrypted PKCS#8 / PKCS#12 files.
+  See :doc:`gm` for details.
+
 
 Introduction
 ============

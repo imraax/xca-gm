@@ -2,6 +2,8 @@
  *
  * XCA-GM: Chinese GM/T (SM2 / SM3 / SM4) end-to-end tests
  *
+ * Copyright (C) 2026 RaaX - https://github.com/imraax/xca-gm
+ *
  * All rights reserved.
  */
 

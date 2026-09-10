@@ -1,6 +1,6 @@
 
-_XCA_WORDS="$(XCA_ARGUMENTS=completion xca)"
+_XCA_WORDS="$(XCA_ARGUMENTS=completion xca-gm)"
 _xca() {
   COMPREPLY=($(compgen -f -W "$_XCA_WORDS" -- "${COMP_WORDS[COMP_CWORD]}"))
 }
-complete -F _xca xca
+complete -F _xca xca-gm

@@ -32,7 +32,7 @@ There is also a commandline option to issue a CRL:
 
 .. code-block:: bash
 
-  xca --crlgen="My Ca" --pem --print
+  xca-gm --crlgen="My Ca" --pem --print
 
 .. index:: crlexport (crlexport)
 

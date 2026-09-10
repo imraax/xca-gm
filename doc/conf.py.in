@@ -18,8 +18,9 @@
 # -- Project information -----------------------------------------------------
 
 project = '@PROJECT_NAME@'
-copyright = '2024, Christian Hohnstädt'
-author = 'Christian Hohnstädt'
+copyright = '2026 RaaX (XCA-GM); 2001-2024 Christian Hohnstädt (XCA)'
+author = 'RaaX'
+html_title = 'XCA-GM 国密证书管理器'
 master_doc = 'index'
 
 # The full version, including alpha/beta/rc tags

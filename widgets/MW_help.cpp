@@ -97,10 +97,15 @@ void MainWindow::about()
 
 	Entropy::seed_rng();
 	cont = QString(
-	"<p><h3><center><u>XCA%7</u></center></h3>"
-	"<p>Copyright 2001 - 2024 by Christian Hohnstädt\n"
+	"<p><h3><center><u>" XCA_GM_NAME " " XCA_GM_NAME_ZH "%7</u></center></h3>"
+	"<p><center>X Certificate and Key management with Chinese GM/T "
+	"(SM2 / SM3 / SM4) support</center>"
+	"<p>Copyright 2026 by " XCA_GM_AUTHOR
+	" - <a href=\"" XCA_GM_URL "\">" XCA_GM_URL "</a>"
 	"<p>Version: %3<p>%1" /* commithash, OpenSSL & Qt Version */
-	"<p><a href=\"https://hohnstaedt.de/xca\">https://hohnstaedt.de/xca</a>"
+	"<p>Based on <a href=\"https://github.com/chris2511/xca\">XCA</a> "
+	"Copyright 2001 - 2024 by Christian Hohnstädt and on "
+	"<a href=\"https://github.com/Tongsuo-Project/Tongsuo\">Tongsuo</a>"
 	"<p>OpenSSL legacy provider%2 loaded"
 	"<p><table border=\"0\">"
 	"<tr><td>Installation path:</td><td>%4</td></tr>"
@@ -108,8 +113,10 @@ void MainWindow::about()
 	"<tr><td>Working directory:</td><td>%6</td></tr>"
 	"</table><br/>"
 	"<hr><table border=\"0\">"
+	"<tr><th align=left>" XCA_GM_AUTHOR "</th><td><u>" XCA_GM_URL "</u></td></tr>"
+	"<tr><td></td><td>XCA-GM: GM/T (SM2/SM3/SM4) support, Tongsuo integration</td></tr>"
 	"<tr><th align=left>Christian Hohnst&auml;dt</th><td><u>&lt;christian@hohnstaedt.de&gt;</u></td></tr>"
-	"<tr><td></td><td>Programming, Translation and Testing</td></tr>"
+	"<tr><td></td><td>XCA: Programming, Translation and Testing</td></tr>"
 	"<tr><th align=left>Kerstin Steinhauff</th><td><u>&lt;tine@kerstine.de&gt;</td></u></tr>"
 	"<tr><td></td><td>Arts and Graphics</td></tr>"
 	"</table><hr><center><u><b>Maintained Translations</b></u></center>"

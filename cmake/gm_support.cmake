@@ -1,10 +1,11 @@
+# XCA-GM - Copyright (C) 2026 RaaX - https://github.com/imraax/xca-gm
+#
 # Detect Tongsuo and the availability of the Chinese GM/T algorithms
 # SM2 (signature), SM3 (digest) and SM4 (cipher) in the crypto library.
 #
 # Sets:
 #   TONGSUO_FOUND, TONGSUO_VERSION_STRING
-#   XCA_GM_ENABLED  -> adds the XCA_GM compile definition,
-#                      the "-gm" version suffix and the xca-gm package name
+#   XCA_GM_ENABLED  -> adds the XCA_GM compile definition
 
 set(XCA_GM_ENABLED OFF)
 set(TONGSUO_FOUND OFF)
@@ -69,12 +70,9 @@ if (OPENSSL_INCLUDE_DIR)
 endif()
 
 if (XCA_GM_ENABLED)
-  message(STATUS "Building the GM edition: xca-gm (SM2/SM3/SM4 enabled)")
+  message(STATUS "GM/T SM2/SM3/SM4 support enabled")
   set(XCA_GM ON)
-  set(XCA_VERSION_SUFFIX "-gm")
-  set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}-gm")
   add_compile_definitions(XCA_GM)
 else()
   unset(XCA_GM)
-  set(XCA_VERSION_SUFFIX "")
 endif()

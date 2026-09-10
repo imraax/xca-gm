@@ -1,7 +1,9 @@
 [Desktop Entry]
-Name=XCA
+Name=XCA-GM
+Name[zh_CN]=XCA-GM 国密证书管理器
 Type=Application
-Comment=A graphical user interface for handling and issuing X.509 compliant Certificates
+Comment=A graphical user interface for handling and issuing X.509 compliant Certificates with Chinese GM/T (SM2/SM3/SM4) support
+Comment[zh_CN]=支持国密算法 (SM2/SM3/SM4) 的 X.509 证书与密钥管理工具
 Comment[de]=Eine graphische Oberfläche zur Erstellung von X.509 konformen Zertifikaten
 Comment[fi]=Graafinen X.509-varmenteiden hallintatyökalu
 Comment[fr]=Création et gestion de certificats conformes à la norme X.509
@@ -11,8 +13,8 @@ Comment[nl]=Een grafische gebruikers interface voor behandeling en uitgifte van 
 Comment[sk]=GUI na spracovanie a vydávanie Certifikátov X.509
 Comment[pt_BR]=Interface gráfica para gerenciar e emitir Certificados X.509
 Comment[it]=Interfaccia grafica per generare e gestire certificati X.509
-Exec=xca %F
-Icon=de.hohnstaedt.xca
+Exec=xca-gm %F
+Icon=io.github.imraax.xca-gm
 Terminal=false
 Categories=Utility;Qt
 MimeType=application/x-xca-database;application/x-xca-template;application/x-x509-ca-cert;application/pkcs10;application/x-pkcs7-certificates;application/x-pkcs12;

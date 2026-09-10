@@ -1,3 +1,13 @@
+XCA-GM (https://github.com/imraax/xca-gm)
+=========================================
+
+RaaX
+	XCA-GM: Chinese GM/T (SM2/SM3/SM4) support, Tongsuo integration,
+	Simplified Chinese localisation, packaging and maintenance
+
+Based on XCA (https://github.com/chris2511/xca)
+===============================================
+
 Christian Hohnstädt <christian@hohnstaedt.de>
 	Programming, translation, testing
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>io.github.imraax.xca-gm</id>
+    <name>XCA-GM</name>
+    <name xml:lang="zh_CN">XCA-GM 国密证书管理器</name>
+    <summary>X Certificate and Key management with Chinese GM/T (SM2/SM3/SM4) support</summary>
+    <summary xml:lang="zh_CN">支持国密算法的 X.509 证书与密钥管理工具</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <developer_name>RaaX</developer_name>
+    <url type="homepage">https://github.com/imraax/xca-gm</url>
+    <url type="bugtracker">https://github.com/imraax/xca-gm/issues</url>
+    <provides>
+        <binary>xca-gm</binary>
+    </provides>
+    <launchable type="desktop-id">io.github.imraax.xca-gm.desktop</launchable>
+    <description>
+        <p>
+            XCA-GM is a fork of XCA that adds the Chinese commercial cryptography algorithms
+            (GM/T: SM2, SM3 and SM4) by building on the Tongsuo crypto library.
+            It is intended for creating and managing X.509 certificates, certificate requests,
+            RSA, DSA, EC and SM2 private keys, Smartcards and CRLs.
+            Everything that is needed for a CA is implemented.
+            All CAs can sign sub-CAs recursively. These certificate chains are shown clearly.
+            For an easy company-wide use there are customiseable templates that can be used for certificate or request generation.
+        </p>
+        <p>Features:</p>
+        <ul>
+            <li>SM2 keys, SM2-with-SM3 signatures for certificates, requests and CRLs</li>
+            <li>SM4 encrypted PKCS#8 keys and PKCS#12 files with HMAC-SM3 integrity</li>
+            <li>Start your own PKI and create all kinds of private keys, certificates, requests or CRLs</li>
+            <li>Import and export them in any format like PEM, DER, PKCS#7, PKCS#12</li>
+            <li>Use them for your IPsec, OpenVPN, TLS or any other certificate based setup</li>
+            <li>Manage your Smart-Cards via PKCS#11 interface</li>
+            <li>Export certificates and requests as OpenSSL config file</li>
+            <li>Create Subject- and/or Extension- templates to ease issuing similar certs</li>
+            <li>Convert existing certificates or requests to templates</li>
+            <li>Supports SQLite, MySQL/MariaDB, PostgreSQL and Microsoft SQL databases</li>
+        </ul>
+    </description>
+    <content_rating type="oars-1.1"/>
+    <releases>
+        <release version="1.0.0" date="2026-09-10">
+            <description>
+                <p>First release of XCA-GM: SM2/SM3/SM4 support based on XCA 2.9.0 and Tongsuo 8.4.0.</p>
+            </description>
+        </release>
+    </releases>
+</component>

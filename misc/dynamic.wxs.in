@@ -37,7 +37,7 @@
 
         <FeatureGroup Id="DatabaseGroup">
             <Feature Id="Databases" Title="Remote Database Drivers"
-                     Description="QT remote database drivers. Additional DLL from the manufacturer are required. See https://github.com/chris2511/xca" Level="1">
+                     Description="QT remote database drivers. Additional DLL from the manufacturer are required. See https://github.com/imraax/xca-gm" Level="1">
                 <Feature Id="SqlOdbc" Title="ODBC SQL Driver" Level="1"
                          Description="Access to ODBC databases sources like Microsoft SQL Server. This driver requires no additional DLL from Microsoft.">
                     <ComponentRef Id="Cqsqlodbc" />

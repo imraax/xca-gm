@@ -1,14 +1,21 @@
-#define XCA_VERSION "@PROJECT_VERSION@@XCA_VERSION_SUFFIX@"
+#define XCA_VERSION "@PROJECT_VERSION@"
+
+/* XCA-GM product identity */
+#define XCA_GM_NAME "@XCA_GM_NAME@"
+#define XCA_GM_NAME_ZH "@XCA_GM_NAME_ZH@"
+#define XCA_GM_AUTHOR "@XCA_GM_AUTHOR@"
+#define XCA_GM_URL "@XCA_GM_URL@"
+#define XCA_GM_APP_ID "@XCA_GM_APP_ID@"
 
 /* Chinese GM/T cryptography (SM2/SM3/SM4) enabled,
  * usually by linking against Tongsuo (https://github.com/Tongsuo-Project/Tongsuo) */
 #cmakedefine XCA_GM
 #cmakedefine TONGSUO_VERSION_STRING "@TONGSUO_VERSION_STRING@"
 
-/* usually "xca" */
+/* usually "xca-gm" */
 #define PACKAGE_TARNAME "@PROJECT_NAME@"
 
-/* usually "X Certificate and Key management" */
+/* Window title: "XCA-GM - X Certificate and Key management (GM/T)" */
 #define PACKAGE_NAME "@PROJECT_DESCRIPTION@"
 
 #define GIT_COMMIT_REV "@GIT_REV@"
@@ -19,5 +26,5 @@
 
 /* Install PREFIX (linux only) */
 #if defined Q_OS_UNIX && ! defined Q_OS_MACOS
-#define INSTALL_DATA_PREFIX "@CMAKE_INSTALL_PREFIX@/share/xca"
+#define INSTALL_DATA_PREFIX "@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@"
 #endif

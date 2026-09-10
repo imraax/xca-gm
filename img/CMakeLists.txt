@@ -5,7 +5,7 @@ file(MAKE_DIRECTORY ${D})
 
 macro(Install_PNG size)
   install(FILES ${S}/xca-icons.iconset/icon_${size}.png
-	DESTINATION ${ICONDIR}/${size}/apps RENAME de.hohnstaedt.xca.png
+	DESTINATION ${ICONDIR}/${size}/apps RENAME ${XCA_GM_APP_ID}.png
   )
   install(FILES ${S}/xca-icons.iconset/icon_${size}.png
 	DESTINATION ${ICONDIR}/${size}/mimetypes RENAME x-xca-database.png
